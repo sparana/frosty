@@ -1,0 +1,12 @@
+<?php
+error_reporting(E_ALL);
+$coll=new MongoClient();
+$db=$coll->storage;
+$coll=$db->users;
+var_dump($coll);
+$data=array("username"=>"vijay","password"=>"vijay");
+echo $coll->insert($data);
+$res=$coll->find();
+var_dump($res);
+
+?>
