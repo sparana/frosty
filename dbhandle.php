@@ -1,11 +1,16 @@
 <?php
 class dbhandle
 {
+	private $dbh;
 	public 	function __contruct($db,$collection)
 	{
-		$dbh=new MongoClient();
-		$dbh=$dbh->selectDB($db)->selectCollection($collection);		return $dbh;
+		$d=new MongoClient();
+		$this->dbh=$d->selectDB($db)->selectCollection($collection);	
 
+	}
+	public getDB()
+	{
+		return $this->dbh;
 	}
 	public function getId($col)
 	{
