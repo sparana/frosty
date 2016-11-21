@@ -4,7 +4,8 @@ include_once "dbhandle.php";
 class MiddleWare
 {
 	private $user_name;
-	$coll=new DBhandler("storage","users");
+	$db=new DBhandler("storage","users");
+	$coll=$db->getDB();
 	public function findUser($username,$password)
 	{
 		$user=$coll->find(["username":$username,"password":$password]);
@@ -91,6 +92,9 @@ class MiddleWare
 			//View FUncitons
 		}
 		else if($action=='')
+		{
+			
+		}
 	}
 }
 
