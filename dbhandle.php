@@ -1,5 +1,5 @@
 <?php
-class dbhandle
+class DBHandler
 {
 	private $dbh;
 	public 	function __contruct($db,$collection)
