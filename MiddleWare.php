@@ -1,19 +1,23 @@
 <?php
 error_reporting(E_ALL);
 include_once "dbhandle.php";
+include_once "httpful.phar";
 class MiddleWare
 {
 	private $user_name;
-	$db=new DBhandler("storage","users");
-	$coll=$db->getDB();
+	private $coll;
+	private $file_id_name_arr=array(array("file_id"=>0,"files_name"=>"Nofil"));
+	function __construct()
+	{
+		$db=new MiddleWare('storage','users');
+		$this->coll=$db->getDB();
+	}
 	public function findUser($username,$password)
 	{
-		$user=$coll->find(["username":$username,"password":$password]);
+		$user=$this->coll->find(["username"=>$username,"password"=>$password]);
 		$num_rows=$user->count();
-		if($num>0)
-		{
+		if($num_rows>0)
 			return true;
-		}
 		else
 			return false;
 	}
@@ -30,7 +34,7 @@ class MiddleWare
 		if($user_exists)
 		{
 			$this->user_name=$username;
-			$res=$this->setSession($username);
+			$res=$this->setSession(array($username));
 
 			return ["status"=>true,"msg"=>"User Logged In Successfully."];
 		}
@@ -47,8 +51,8 @@ class MiddleWare
 			return ['status'=>false,"msg"=>"User already exists. Please choose another username."];
 		}
 		else{
-			$id=$coll->getId($username,$password);
-			$res=$coll->insert(["_id"=>$id,"username"=>$username,"password"=>$password]);
+			$id=$this->coll->getId($username,$password);
+			$res=$this->coll->insert(["_id"=>$id,"username"=>$username,"password"=>$password]);
 			$num=$res->getInsertedId();
 			if($num<=0)
 			{
@@ -61,41 +65,58 @@ class MiddleWare
 		}
 		
 	}
-	public function list($username)
+	public function is_user_logged_in($action)
 	{
-		//$files_name=json_decode();
-		$total_files=count($files_name);
-		$name_id=array(array("file_id"=>0,"file_name"=>"Nothing"));
-		for($i=0;$i<$total_files;$i++)
-		{
-			$name_id[$i]['file_id']+=1;
-			//			$name_id{$i}["file_name"]=$files_name["index_name"];
-
-		}
-		return $name_id;
+		if(isset($_SESSION))
+			return true;
+		else
+			return false;
 	}
-	public function upload($username,$file)
+
+	public function file_list()
+	{
+
+		$this->file_id_name_arr_name=json_decode(); //will be retrived from piyush api
+		
+		
+	}
+	public function upload($file)
 	{
 		$file_json=json_encode($file);
-		//	$msg=
-		return $msg;	
+		$uri="from piyush";
+		// $file_json will be sent to piyush api and status will be recreived  and display next page according to the reponse and call display function according.
+		$response = \Httpful\Request::put($uri)                 
+			    ->sendsJson()                              
+			   // ->authenticateWith('username', 'password')
+			    ->body('{"username":$this->username,"file":$file_json}')
+			    ->send();
+		//check status and do according to the response
+
 	}
-	public function download()
+	public function download($file_id)
 	{
-		
+		$file_name=$this->file_id_name_arr[$file_id-1];
+		$uri="Piyush api url";
+		$response = \Httpful\Request::get($uri)->send();
+		//pass the usernam and this file id to piyush api and file will e
 	}
 	public function display($action,$parameters)
 	{
 		if($action='list')
 		{
-			$file_id_name=$this->list($user_name);
-			//View FUncitons
-		}
-		else if($action=='')
-		{
+			$this->file_list();
 			
+			// call View FUncitons
+		}
+		else if($action=='no_action')
+		{
+		// Call view functions 
 		}
 	}
+	public function logout()
+	{
+		unset($_SESSTION);
+		$this->display('no_action',['msg'=>"Signed out Successfully."]);
+	}
 }
-
 ?>

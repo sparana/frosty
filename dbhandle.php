@@ -8,7 +8,7 @@ class DBHandler
 		$this->dbh=$d->selectDB($db)->selectCollection($collection);	
 
 	}
-	public getDB()
+	public function getDB()
 	{
 		return $this->dbh;
 	}
