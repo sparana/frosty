@@ -1,7 +1,7 @@
 <?php
 include_once "MiddleWare.php";
 
-$mw=new MiddleWare;
+$mw=new MiddleWare();
 if(isset($_GET['action']) && $_GET['action']!='')
 {
 	$action=$_GET['action'];
@@ -43,19 +43,22 @@ if(isset($_GET['action']) && $_GET['action']!='')
 		//	header("Location:index.php?action=''&msg="."Please provide required fields.");
 		
 	}
-	else if($action=='upload')
+	else if($action=="upload")
 	{
-		if(isset($_FILES['file_name']) && $_FILES['file_name'])
-		{
+		var_dump(json_encode($_FILES['file_name']));
+		if(isset($_FILES['file_name']))
+		{	
 			$mw->upload($_FILES['file_name']);
 		}
 		else
 		{
-			$mw->display('list',['msg',"Please choose a file"]);
+			
+			$mw->display('list',['msg'=>"Please choose a file"]);
 		}
 	}
 	else if($action=="download")
 	{
+//		die("kjlksd");
 		$file_id=$_GET['file_id'];
 		$mw->download($file_id);	
 	}
@@ -67,5 +70,10 @@ if(isset($_GET['action']) && $_GET['action']!='')
 	{
 		$mw->display("no_action",[]);
 	}
+}
+else
+{
+	//$arr=array("msg"=>"You are welcome");
+	$mw->display("no_action",[]);
 }
 ?>

@@ -1,0 +1,48 @@
+
+#dd
+{
+background:#000066;
+}
+.list-group-item.active
+{
+background:#000066;
+}
+#imgBox
+{
+	width: 250px;
+	height: 250px;
+	background: url("images/wb.png") no-repeat;
+}
+#imgBox:hover {
+	width: 250px;
+	height: 250px;
+	background: url("images/CW.png") no-repeat;
+	}
+#hc {
+     color:#000066;
+    }
+	
+.navbar-form input, .form-inline input {
+	width:auto;
+}
+.footer
+{
+border-radius:5px;
+background:#000066;
+height:70px;
+position:absolute;
+bottom:0px;
+}
+#logbt
+{
+	background:#000066;
+}
+.cloud
+{
+	bottom:0px;
+}
+
+.foot{
+	bottom:0px;
+}
+

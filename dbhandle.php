@@ -18,4 +18,5 @@ class DBHandler
 		return ($max+1);
 	}
 }
+
 ?>
