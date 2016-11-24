@@ -1,0 +1,6 @@
+[submodule "Sparana"]
+	path = Sparana
+	url = https://github.com/vijay0001/Sparana
+[submodule "sparana_middle"]
+	path = sparana_middle
+	url = https://github.com/doofa/sparana_middle
