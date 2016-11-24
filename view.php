@@ -111,7 +111,7 @@ EOF;
 	  
        if($this->Status=="Logout") {
       $this->navContent_post=<<<EOF
-  <li><a href="#"><span class="glyphicon glyphicon-off"></span>$this->Status</a></li>";
+  <li><a href="index.php?action=logout"><span class="glyphicon glyphicon-off"></span>$this->Status</a></li>";
     </ul>
   </div>
   </nav>
@@ -141,7 +141,7 @@ EOF;
 					
         </div>
         <div class="modal-body" style="padding:40px 50px;">
-          <form role="form" action="" method="Post">
+          <form role="form" action="index.php?action=do_login" method="Post">
             <div class="form-group">
               <label for="usrname"><span class="glyphicon glyphicon-user"></span> Username</label>
               <input type="text" name="username"class="form-control" id="usrname" placeholder="Enter your Username (Ex: Vijay64)" maxlength="10">
@@ -177,12 +177,12 @@ EOF;
           <h4><span class="glyphicon glyphicon-plane"></span> Signup</h4>
         </div>
         <div class="modal-body" style="padding:40px 50px;">
-          <form role="form" action="" method="Post">
+          <form role="form" action="index.php?action=do_signup" method="Post">
             
 			
 			<div class="form-group">
               <label for="usrname">Username</label>
-              <input type="text" name="username"class="form-control" id="i4" placeholder="Choose Your Username"  maxlength="10" required pattern="ID20[0-9][0-9]0[0-9][0-9][0-9]">
+              <input type="text" name="username" class="form-control" id="i4" placeholder="Choose Your Username"  maxlength="10" required >
             </div>
 		
 			

@@ -6,7 +6,7 @@ include_once "view.php";
 
 class MiddleWare
 {
-	private $user_name;
+	//private $user_name;
 	private $coll;
 	private $file_id_name_arr=array(array("file_id"=>0,"files_name"=>"Nofil"));
 	function __construct()
@@ -17,6 +17,7 @@ class MiddleWare
 	public function findUser($username,$password)
 	{
 		$user=$this->coll->find(["username"=>$username,"password"=>$password]);
+		echo "From findUser";
 		$num_rows=$user->count();
 		if($num_rows>0)
 			return true;
@@ -25,25 +26,29 @@ class MiddleWare
 	}
 	public function getId()
 	{
+	
 		$max = $this->coll->find(array(), array('_id' => 1))->sort(array('_id' => -1))->limit(1);
+		echo "From getid";
+		echo $max;
 		return ($max+1);
 	}
 	public function setSession($values)
 	{
-		$cnt=count($valuse);
-		for($i=0;$i<$cnt;$i++)
-			$_SESSION[$values[0]]=$values[0];
+//		$cnt=count($valuse);
+//		for($i=0;$i<$cnt;$i++)
+			$_SESSION["username"]=$values;
+		echo "from set session";
 		return true;
 	}
 	public function login($username,$password)
 	{
 		$user_exists=$this->findUser($username,$password);
+		echo "Login";
 		if($user_exists)
 		{
 			$this->user_name=$username;
-			$res=$this->setSession(array($username));
-
-			return ["status"=>true,"msg"=>"User Logged In Successfully."];
+			$res=$this->setSession($username);
+			return ["status"=>true,"msg"=>"User Logged In Successfully.","username"=>$username];
 		}
 		else
 		{
@@ -52,23 +57,19 @@ class MiddleWare
 	}
 	public function signup($username,$password)
 	{
+		
 		$user_exists=$this->findUser($username,$password);
+		echo "From signup";
 		if($user_exists)
 		{
 			return ['status'=>false,"msg"=>"User already exists. Please choose another username."];
 		}
 		else{
-			$id=$this->getId();
-			$res=$this->coll->insert(["_id"=>$id,"username"=>$username,"password"=>$password]);
-			$num=$res->getInsertedId();
-			if($num<=0)
-			{
-				return ["status"=>false,"msg"=>"Something Went Wrong"];
-			}
-			else
-			{
-				return ["status"=>true,"msg"=>"Signed Up successfully."];
-			}		
+			//			$id=$this->getId();\
+			//$this->user_name=$username;
+			//$this->user_name;
+			$res=$this->coll->insert(["username"=>$username,"password"=>$password]);
+			return ["status"=>true,"msg"=>"Signed Up successfully.","username"=>$username];				
 		}
 		
 	}
@@ -87,12 +88,10 @@ class MiddleWare
 		
 		
 	}
-	public function upload($file)
+	public function upload($username,$file)
 	{
-		$file_json=json_encode($file);
-
-		
-		$this->display('list',['msg'=>"This functionality has not added so far"]);
+		$file_json=json_encode($file);	
+		$this->display('list',['msg'=>"This functionality has not been added so far","username"=>$username]);
 	//	$uri="from piyush";
 		// $file_json will be sent to piyush api and status will be recreived  and display next page according to the reponse and call display function according.
 //		$response = \Httpful\Request::put($uri)                 
@@ -103,10 +102,11 @@ class MiddleWare
 		//check status and do according to the response
 
 	}
-	public function download($file_id)
+	public function download($username,$file_id)
 	{
+
 	//	$file_name=$this->file_id_name_arr[$file_id-1];
-		$this->display("list",["msg"=>"This functionality has not been added."]);	
+		$this->display("list",["msg"=>"This functionality has not been added.","username"=>$username]);	
 //		$uri="Piyush api url";
 //		$response = \Httpful\Request::get($uri)->send();
 		//pass the usernam and this file id to piyush api and file will e
@@ -114,16 +114,19 @@ class MiddleWare
 	public function display($action,$parameters=array())
 	{
 	//	echo $action;
-		//var_dump($parameters);
+		var_dump($parameters);
 		if($action=="list")
 		{
 			$msg="You are welcome";
 			if(isset($parameters['msg']))
 				$msg=$parameters['msg'];
+			$user="Username";
+			if(isset($parameters["username"]))
+				$user=$parameters["username"];
+			echo $user;
 			$this->file_list();
-			$Sparana_nav = new Sparana_Navbar('Sparana',"vijay ",'Logout');
-		 	echo $Sparana_nav;
-		 
+			$Sparana_nav = new Sparana_Navbar('Sparana',$user,'Logout');
+		 	echo $Sparana_nav; 
 		 $Sparana_head = new Sparana_Head('Sparana');
 			echo $Sparana_head;
 
