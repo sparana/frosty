@@ -1,6 +1,6 @@
 <?php
 error_reporting(E_ALL);
-include_once "dbhandle.php";
+//include_once "dbhandle.php";
 include_once "httpful.phar";
 include_once "view.php";
 
@@ -11,8 +11,8 @@ class MiddleWare
 	private $file_id_name_arr=array(array("file_id"=>0,"files_name"=>"Nofil"));
 	function __construct()
 	{
-		$db=new DBHandler('storage','users');
-		$this->coll=$db->getDB();
+		$d=new MongoClient();
+		$this->coll=$d->selectDB("storage")->selectCollection("users");
 	}
 	public function findUser($username,$password)
 	{
@@ -22,6 +22,11 @@ class MiddleWare
 			return true;
 		else
 			return false;
+	}
+	public function getId()
+	{
+		$max = $this->coll->find(array(), array('_id' => 1))->sort(array('_id' => -1))->limit(1);
+		return ($max+1);
 	}
 	public function setSession($values)
 	{
@@ -53,7 +58,7 @@ class MiddleWare
 			return ['status'=>false,"msg"=>"User already exists. Please choose another username."];
 		}
 		else{
-			$id=$this->coll->getId($username,$password);
+			$id=$this->getId();
 			$res=$this->coll->insert(["_id"=>$id,"username"=>$username,"password"=>$password]);
 			$num=$res->getInsertedId();
 			if($num<=0)
@@ -86,7 +91,7 @@ class MiddleWare
 	{
 		$file_json=json_encode($file);
 
-		var_dump($file_json);
+		
 		$this->display('list',['msg'=>"This functionality has not added so far"]);
 	//	$uri="from piyush";
 		// $file_json will be sent to piyush api and status will be recreived  and display next page according to the reponse and call display function according.
@@ -116,8 +121,8 @@ class MiddleWare
 			if(isset($parameters['msg']))
 				$msg=$parameters['msg'];
 			$this->file_list();
-			$Sparana_nav = new Sparana_Navbar('Sparana');
-		 echo $Sparana_nav;
+			$Sparana_nav = new Sparana_Navbar('Sparana',"vijay ",'Logout');
+		 	echo $Sparana_nav;
 		 
 		 $Sparana_head = new Sparana_Head('Sparana');
 			echo $Sparana_head;
@@ -139,12 +144,6 @@ class MiddleWare
 	{
 		unset($_SESSTION);
 		$this->display('no_action',['msg'=>"Signed out Successfully."]);
-	}
-	public function harish($h="Ashok")
-	{
-		
-	 die("Harish".$h);
-	 
 	}
 }
 

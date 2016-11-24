@@ -257,10 +257,10 @@ EOF;
 		<div class="row">
 		
 		<div class="col-md-3">
-         <form role="form" action="index.php?action=upload" method="Post" enctype="multipart-form-data">
+         <form role="form" action="index.php?action=upload" method="POST" enctype="multipart/form-data">
             <div class="form-group">
               
-              <input type="file" name="file_name"class="form-control" id="file_data"  maxlength="10">
+              <input type="file" name="file_name" class="form-control" id="file_data"  maxlength="10">
             </div>
             
               <button type="submit" class="btn btn-success btn-block" id="uploadbt"><span class="glyphicon glyphicon-upload"></span>GO</button>
