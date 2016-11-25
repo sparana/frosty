@@ -1,7 +1,8 @@
 <?php
+session_start();
 include_once "MiddleWare.php";
 
-$mw=new MiddleWare;
+$mw=new MiddleWare();
 if(isset($_GET['action']) && $_GET['action']!='')
 {
 	$action=$_GET['action'];
@@ -13,10 +14,8 @@ if(isset($_GET['action']) && $_GET['action']!='')
 			$msg=$response['msg'];
 			if($response['status'])
 				$mw->display('list',[]);
-
 			else
-				$mw->display('no_action',['msg'=>$msg]);
-//				header("Location:index.php?action=''&msg=".$msg);		
+				$mw->display('no_action',['msg'=>$msg]);		
 		}
 		else
 			$mw->display('no_action',['msg'=>"Please provide required fields."]);
@@ -29,35 +28,37 @@ if(isset($_GET['action']) && $_GET['action']!='')
 			$msg=$response['msg'];
 			if($response['status'])
 			{
-//				header("Location:index.php?action=signup&msg=".$msg);
 				$mw->display('list',[]);
-			}
-				
+			}	
 			else
 				$mw->display('no_action',['msg'=>$msg]);
-//				header("Location:index.php?action=''&msg=".$msg);
-		
 		}
 		else
 			$mw->display('no_action',['msg'=>"Please provide required fields"]);
-		//	header("Location:index.php?action=''&msg="."Please provide required fields.");
 		
 	}
-	else if($action=='upload')
+	else if($action=="upload")
 	{
-		if(isset($_FILES['file_name']) && $_FILES['file_name'])
-		{
-			$mw->upload($_FILES['file_name']);
+		if(isset($_FILES['file_name']))
+		{	
+			
+			$response=$mw->upload($_FILES['file_name']);
+			if($response['status']==1)
+				$mw->display('list',['msg'=>"File has been uploaded successfully."]);
+			else
+				$mw->display('list',['msg'=>"Something went wrong"]);		
 		}
 		else
 		{
-			$mw->display('list',['msg',"Please choose a file"]);
+			$mw->display('list',['msg'=>"Please choose a file"]);
 		}
+			
 	}
 	else if($action=="download")
 	{
-		$file_id=$_GET['file_id'];
-		$mw->download($file_id);	
+		$file_id=$_GET['file_name'];
+		$mw->download($file_id);
+			
 	}
 	else if($action=='signout')
 	{
@@ -67,5 +68,12 @@ if(isset($_GET['action']) && $_GET['action']!='')
 	{
 		$mw->display("no_action",[]);
 	}
+}
+else
+{
+	if(isset($_SESSION))
+		$mw->display('list',['msg'=>"Successfull"]);
+	else	
+		$mw->display("no_action",[]);
 }
 ?>

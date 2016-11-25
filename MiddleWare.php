@@ -1,16 +1,18 @@
 <?php
-error_reporting(E_ALL);
-include_once "dbhandle.php";
+session_start();
 include_once "httpful.phar";
+include_once "Sparana/view.php";
+
 class MiddleWare
 {
-	private $user_name;
+	//private $user_name;
 	private $coll;
+	private $base_uri="10.44.78.44:9090";
 	private $file_id_name_arr=array(array("file_id"=>0,"files_name"=>"Nofil"));
 	function __construct()
 	{
-		$db=new MiddleWare('storage','users');
-		$this->coll=$db->getDB();
+		$d=new MongoClient();
+		$this->coll=$d->selectDB("storage")->selectCollection("users");
 	}
 	public function findUser($username,$password)
 	{
@@ -21,11 +23,16 @@ class MiddleWare
 		else
 			return false;
 	}
+	public function getId()
+	{
+	
+		$max = $this->coll->find(array(), array('_id' => 1))->sort(array('_id' => -1))->limit(1);
+		return ($max+1);
+	}
 	public function setSession($values)
 	{
-		$cnt=count($valuse);
-		for($i=0;$i<$cnt;$i++)
-			$_SESSION[$values[0]]=$values[0];
+
+		$_SESSION["username"]=$values;
 		return true;
 	}
 	public function login($username,$password)
@@ -33,85 +40,96 @@ class MiddleWare
 		$user_exists=$this->findUser($username,$password);
 		if($user_exists)
 		{
-			$this->user_name=$username;
-			$res=$this->setSession(array($username));
-
-			return ["status"=>true,"msg"=>"User Logged In Successfully."];
+			$res=$this->setSession($username);
+			return ["status"=>true,"msg"=>"User Logged In Successfully.","username"=>$username];
 		}
 		else
 		{
-			return ["status"=>false,"mag"=>"User does not exist"];
+			return ["status"=>false,"msg"=>"User does not exist"];
 		}
 	}
 	public function signup($username,$password)
 	{
+		
 		$user_exists=$this->findUser($username,$password);
 		if($user_exists)
 		{
 			return ['status'=>false,"msg"=>"User already exists. Please choose another username."];
 		}
 		else{
-			$id=$this->coll->getId($username,$password);
-			$res=$this->coll->insert(["_id"=>$id,"username"=>$username,"password"=>$password]);
-			$num=$res->getInsertedId();
-			if($num<=0)
-			{
-				return ["status"=>false,"msg"=>"Something Went Wrong"];
-			}
-			else
-			{
-				return ["status"=>true,"msg"=>"Signed Up successfully."];
-			}		
+			$res=$this->coll->insert(["username"=>$username,"password"=>$password]);
+			return ["status"=>true,"msg"=>"Signed Up successfully.","username"=>$username];				
 		}
 		
 	}
-	public function is_user_logged_in($action)
-	{
-		if(isset($_SESSION))
-			return true;
-		else
-			return false;
-	}
-
 	public function file_list()
 	{
-
-		$this->file_id_name_arr_name=json_decode(); //will be retrived from piyush api
+		$url=$this->base_uri."/api/list/".$_SESSION['username'];
+		$response = \Httpful\Request::get($url)->send();
+		$file_names=array();
+		$files=json_decode($response,TRUE);
+		foreach($files as $file)
+			$file_names[]=$file['filename'];
+		return $file_names;
 		
 		
 	}
 	public function upload($file)
 	{
-		$file_json=json_encode($file);
-		$uri="from piyush";
-		// $file_json will be sent to piyush api and status will be recreived  and display next page according to the reponse and call display function according.
-		$response = \Httpful\Request::put($uri)                 
+		$data=array('username'=>$_SESSION['username'],'filename'=>$file['name'],'filecontent'=>base64_encode(file_get_contents($file['tmp_name'])),'type'=>$file['type'],'size'=>$file['size']);
+		$file_json=json_encode($data);
+		$uri=$this->base_uri."/api/file/upload";
+		$response = \Httpful\Request::post($uri)                 
 			    ->sendsJson()                              
-			   // ->authenticateWith('username', 'password')
-			    ->body('{"username":$this->username,"file":$file_json}')
+			    ->body($file_json)
 			    ->send();
-		//check status and do according to the response
-
+		$respons=json_decode($response, TRUE);
+		return $respons;
 	}
-	public function download($file_id)
+	public function download($file_name)
 	{
-		$file_name=$this->file_id_name_arr[$file_id-1];
-		$uri="Piyush api url";
-		$response = \Httpful\Request::get($uri)->send();
-		//pass the usernam and this file id to piyush api and file will e
+		$username=$_SESSION['username'];
+		$url=$this->base_uri."/api/file";
+		$response = \Httpful\Request::post($url)                 
+			    ->sendsJson()                              
+			    ->body(json_encode(['username'=>$username,'filename'=>$file_name]))
+			    ->send();
+		$file=json_decode($response,TRUE);
+		 header('Content-Description: File Transfer');
+    		header('Content-Type: '.$file['type']);
+		    header('Content-Disposition: attachment; filename='. $file['filename']);
+		    header('Content-Transfer-Encoding: binary');
+		    header('Expires: 0');
+		    header('Cache-Control: must-revalidate');
+		    header('Pragma: public');
+		    header('Content-Length: ' .$file['size']);
+		    ob_clean();
+		    flush();
+		   echo base64_decode($file['filecontent']);
+		    exit;
+		
 	}
-	public function display($action,$parameters)
+	public function display($action,$parameters=array())
 	{
-		if($action='list')
+		if($action=="list")
 		{
-			$this->file_list();
-			
-			// call View FUncitons
+			$msg="You are welcome";
+			if(isset($parameters['msg']))
+				$msg=$parameters['msg'];
+			$user=$_SESSION['username'];
+			$file_names=$this->file_list();
+			echo (new Sparana_Navbar('Sparana',$user,'Logout'));
+		 	echo (new Sparana_Head('Sparana'));
+			echo (new Sparana_Body($msg,$file_names));
 		}
-		else if($action=='no_action')
+		else if($action=="no_action")
 		{
-		// Call view functions 
+			$msg=" ";
+			if(isset($parameters['msg']))
+				$msg=$parameters['msg'];
+			echo (new Sparana_Default($msg));
 		}
+	
 	}
 	public function logout()
 	{
@@ -119,4 +137,6 @@ class MiddleWare
 		$this->display('no_action',['msg'=>"Signed out Successfully."]);
 	}
 }
+
+
 ?>
