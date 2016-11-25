@@ -1,3 +1,0 @@
-<?php
-echo "Any thing";
-?>
