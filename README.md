@@ -8,9 +8,6 @@ Frosty is Sparana's Frontend using core-storage API.
 [Sparana Frontend lib](https://github.com/vijay0001/Sparana) by
 [Vijay Kumar Prajapat](https://github.com/vijay0001)
 
-[Sparana](https://github.com/doofa/sparana_middle) by
-[Harish Rathor](https://github.com/doofa)
-
 
 ## License
 
